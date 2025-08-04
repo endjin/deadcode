@@ -9,10 +9,13 @@ DeadCode combines static reflection-based method extraction with runtime trace p
 ## Features
 
 - **Static Analysis**: Extracts all methods from compiled assemblies using reflection
-- **Dynamic Profiling**: Uses dotnet-trace to capture runtime execution data
+- **Dynamic Profiling**: Uses dotnet-trace to capture runtime execution data with JIT event tracking
 - **Safety Classification**: Categorizes methods by removal safety (High/Medium/Low/DoNotRemove)
 - **LLM-Ready Output**: Generates minimal JSON with file:line references
 - **Rich CLI**: Beautiful terminal interface with progress indicators
+- **Framework Filtering**: Automatically filters out System.*, Microsoft.*, and Internal.* methods
+- **Smart Method Handling**: Special handling for async state machines, lambdas, and constructors
+- **Interactive Setup**: Automatic dotnet-trace installation if missing
 - **Modern .NET**: Built on .NET 9.0 with C# 12 language features
 
 ## Installation
@@ -75,7 +78,9 @@ Example `inventory.json`:
 deadcode profile MyApp.exe --scenarios scenarios.json -o traces/
 ```
 
-**Note**: Profiling uses dotnet-trace with JIT event tracking for deterministic method detection. The tool will automatically install dotnet-trace if it's not present. See [LIMITATIONS.md](LIMITATIONS.md) for details on remaining edge cases.
+**Supported trace formats:**
+- `.nettrace` - Binary format from dotnet-trace (default)
+- `.txt` - Text format for testing and debugging
 
 #### 3. Analyze for Unused Code
 
@@ -85,7 +90,7 @@ deadcode analyze -i inventory.json -t traces/ -o report.json --min-confidence hi
 
 ### Scenarios Configuration
 
-Create `scenarios.json` to define test scenarios:
+Create `scenarios.json` to define test scenarios with all available options:
 
 ```json
 {
@@ -102,6 +107,12 @@ Create `scenarios.json` to define test scenarios:
       "description": "Test main data processing workflow"
     },
     {
+      "name": "error-handling",
+      "arguments": ["process", "--input", "invalid.csv"],
+      "expectFailure": true,
+      "description": "Test error handling with invalid input"
+    },
+    {
       "name": "api-endpoints",
       "arguments": ["serve", "--port", "8080"],
       "duration": 60,
@@ -110,6 +121,13 @@ Create `scenarios.json` to define test scenarios:
   ]
 }
 ```
+
+**Scenario options:**
+- `name` (required): Unique scenario identifier
+- `arguments`: Command line arguments to pass
+- `duration`: Maximum seconds to run (omit to run to completion)
+- `description`: Human-readable description
+- `expectFailure`: Set to true if the scenario should fail (e.g., for error handling tests)
 
 ## Output Format
 
@@ -130,16 +148,31 @@ The tool generates LLM-ready JSON that only includes methods with source locatio
 }
 ```
 
-Methods without source locations (e.g., compiler-generated methods) are automatically filtered from the output.
+**Note**: Methods without source locations (e.g., compiler-generated methods) are automatically filtered from the output to keep it minimal and actionable.
 
 ## Safety Classification
 
-| Level                | Criteria                                                      | Examples                                            | Recommendation         |
-|----------------------|---------------------------------------------------------------|-----------------------------------------------------|------------------------|
-| **HighConfidence**   | Private methods, no special attributes                        | Private helper methods, internal utilities          | Safe to remove         |
-| **MediumConfidence** | Protected/Virtual methods, property accessors, event handlers | Override methods, getters/setters, OnClick handlers | Review carefully       |
-| **LowConfidence**    | Public methods, test methods                                  | API endpoints, public interfaces, unit tests        | Likely false positives |
-| **DoNotRemove**      | Framework attributes, security code, P/Invoke                 | [DllImport], [Serializable], [SecurityCritical]     | Never remove           |
+### Classification Levels
+
+| Level | Criteria | Examples | Recommendation |
+|-------|----------|----------|----------------|
+| **HighConfidence** | Private methods, no special attributes | Private helper methods, internal utilities | Safe to remove |
+| **MediumConfidence** | Protected/Virtual methods, property accessors, event handlers | Override methods, getters/setters, OnClick handlers | Review carefully |
+| **LowConfidence** | Public methods, test methods | API endpoints, public interfaces, unit tests | Likely false positives |
+| **DoNotRemove** | Framework attributes, security code, P/Invoke | [DllImport], [Serializable], [SecurityCritical] | Never remove |
+
+### Advanced Classification Rules
+
+The tool detects and classifies based on:
+- **Event Handlers**: Methods with `(object sender, EventArgs e)` signature → MediumConfidence
+- **Test Methods**: Attributes containing Test, Fact, or Theory → LowConfidence
+- **COM Interop**: Methods with [ComVisible] → DoNotRemove
+- **Generated Code**: [GeneratedCode] attribute → DoNotRemove
+- **Security**: [SecurityCritical], [SecuritySafeCritical] → DoNotRemove
+- **Serialization**: [Serializable] on type → DoNotRemove for all methods
+- **Constructors**: Special handling for .ctor and .cctor
+- **Async Methods**: Normalizes async state machine methods to their original names
+- **Lambda Classes**: Normalizes compiler-generated lambda display classes
 
 ## Commands
 
@@ -161,12 +194,14 @@ Profile application execution to collect runtime trace data.
 - `-o, --output` - Output directory for trace files (default: traces/)
 - `--duration` - Profiling duration in seconds
 
+**Note**: If the executable is a DLL, the tool automatically uses `dotnet` to run it.
+
 ### `analyze`
 Analyze method inventory against trace data to find unused code.
 
 **Options:**
 - `-i, --inventory` - Method inventory JSON file
-- `-t, --traces` - Trace files or directory
+- `-t, --traces` - Trace files or directory (supports both .nettrace and .txt)
 - `-o, --output` - Output path for report
 - `--min-confidence` - Minimum confidence level (high/medium/low)
 
@@ -179,6 +214,24 @@ Run complete analysis pipeline.
 - `--scenarios` - Scenarios configuration
 - `--output` - Output directory for all artifacts
 - `--min-confidence` - Minimum confidence level
+
+## Technical Details
+
+### Profiling Implementation
+- Uses **JIT event tracking** for deterministic method detection
+- Event providers: `Microsoft-Windows-DotNETRuntime:0x4C14FCCBD:5`
+- Buffer size: 512 MB for method-heavy applications
+- Captures methods as they are JIT-compiled, ensuring complete coverage
+
+### Method Filtering
+- **Framework methods** (System.*, Microsoft.*, Internal.*) are automatically filtered
+- Focus on **application code** only
+- Configurable with `--include-generated` flag for compiler-generated methods
+
+### Interactive Features
+- **Automatic dependency installation**: Prompts to install dotnet-trace if missing
+- **Rich progress indicators**: Real-time status for all operations
+- **Detailed summaries**: Tables showing analysis results
 
 ## Architecture
 
@@ -213,6 +266,31 @@ Solutions/
 - **External Triggers**: Misses webhook/scheduled task handlers
 - **DI Services**: May flag injected but unused services
 - **Edge Cases**: Some dynamic/reflection calls and external triggers may be missed. See [LIMITATIONS.md](LIMITATIONS.md) for details and alternatives
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue**: "Executable not found" error
+- **Solution**: Ensure the executable path is correct and the file exists
+
+**Issue**: No methods found in trace
+- **Solution**: Verify the application actually executes code paths. Increase duration or add more comprehensive scenarios
+
+**Issue**: Large trace files
+- **Solution**: Limit profiling duration or focus on specific scenarios. Trace files can grow large for long-running applications
+
+**Issue**: Missing source locations
+- **Solution**: Build with debug symbols (PDB files) and ensure they're in the same directory as assemblies
+
+### Debug Logging
+
+Enable detailed logging by setting the minimum log level:
+```bash
+# Set via environment variable (example for bash)
+export Logging__LogLevel__Default=Debug
+deadcode analyze -i inventory.json -t traces/
+```
 
 ## Development
 
