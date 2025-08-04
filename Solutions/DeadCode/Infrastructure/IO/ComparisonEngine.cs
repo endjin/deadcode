@@ -60,7 +60,8 @@ public class ComparisonEngine : IComparisonEngine
             {
                 logger.LogDebug("Method not found in execution trace: {Method}", method.FullyQualifiedName);
 
-                // TODO: In a real implementation, we would analyze dependencies here
+                // Note: Dependency analysis could be enhanced to track registration points,
+                // initialization code, and cross-assembly references for more accurate reporting
                 List<string> dependencies = [];
 
                 UnusedMethod unusedMethod = new(method, dependencies);

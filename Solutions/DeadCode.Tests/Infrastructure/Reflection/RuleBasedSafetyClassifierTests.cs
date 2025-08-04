@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 using DeadCode.Core.Models;
 using DeadCode.Infrastructure.Reflection;
+using DeadCode.Tests.TestHelpers;
 
 using Microsoft.Extensions.Logging;
 
@@ -148,8 +149,7 @@ public class RuleBasedSafetyClassifierTests
     // Test helper classes
     private class TestClassWithAttributes
     {
-        [DllImport("kernel32.dll")]
-        public static extern bool DllImportMethod();
+        public static bool DllImportMethod() => NativeMethods.DllImportMethod();
     }
 
     [Serializable]
