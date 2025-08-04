@@ -1,0 +1,47 @@
+{
+  "scenarios": [
+    {
+      "name": "default-run",
+      "arguments": [],
+      "description": "Run the application with default behavior",
+      "duration": 5
+    },
+    {
+      "name": "help",
+      "arguments": ["--help"],
+      "description": "Display help information",
+      "duration": 2
+    },
+    {
+      "name": "verbose",
+      "arguments": ["--verbose"],
+      "description": "Run with verbose output",
+      "duration": 5
+    },
+    {
+      "name": "calculator-only",
+      "arguments": ["--calculator"],
+      "description": "Test only calculator functionality",
+      "duration": 3
+    },
+    {
+      "name": "data-processing",
+      "arguments": ["--process", "test-data.txt"],
+      "description": "Test data processing functionality",
+      "duration": 10
+    },
+    {
+      "name": "stress-test",
+      "arguments": ["--stress", "100"],
+      "description": "Run stress test with 100 iterations",
+      "duration": 30
+    },
+    {
+      "name": "error-handling",
+      "arguments": ["--invalid-option"],
+      "description": "Test error handling with invalid arguments",
+      "expectFailure": true,
+      "duration": 2
+    }
+  ]
+}
