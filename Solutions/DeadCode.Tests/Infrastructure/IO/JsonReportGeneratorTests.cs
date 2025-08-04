@@ -115,13 +115,9 @@ public class JsonReportGeneratorTests
         string json = await File.ReadAllTextAsync(_tempFile);
         JsonDocument parsed = JsonDocument.Parse(json);
 
+        // Methods without source locations should be filtered out
         JsonElement lowConfidence = parsed.RootElement.GetProperty("lowConfidence");
-        lowConfidence.GetArrayLength().ShouldBe(1);
-
-        JsonElement firstMethod = lowConfidence[0];
-        firstMethod.GetProperty("file").ValueKind.ShouldBe(JsonValueKind.Null);
-        firstMethod.GetProperty("line").ValueKind.ShouldBe(JsonValueKind.Null);
-        firstMethod.GetProperty("method").GetString().ShouldBe("NoLocationMethod");
+        lowConfidence.GetArrayLength().ShouldBe(0);
     }
 
     [TestMethod]
@@ -209,9 +205,7 @@ public class JsonReportGeneratorTests
             Signature: $"{name}()",
             Visibility: MethodVisibility.Private,
             SafetyLevel: safety,
-            Location: safety == SafetyClassification.HighConfidence
-                ? new SourceLocation($"{name}.cs", 10, 12, 20)
-                : null
+            Location: new SourceLocation($"{name}.cs", 10, 12, 20)
         );
 
         return new UnusedMethod(method, ["dep1", "dep2"]);

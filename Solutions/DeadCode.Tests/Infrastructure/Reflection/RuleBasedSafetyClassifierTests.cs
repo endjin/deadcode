@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 using DeadCode.Core.Models;
 using DeadCode.Infrastructure.Reflection;
-using DeadCode.Tests.TestHelpers;
 
 using Microsoft.Extensions.Logging;
 
@@ -147,10 +146,13 @@ public class RuleBasedSafetyClassifierTests
     }
 
     // Test helper classes
+#pragma warning disable CA1060 // Move pinvokes to native methods class - Required for testing
     private class TestClassWithAttributes
     {
-        public static bool DllImportMethod() => NativeMethods.DllImportMethod();
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        public static extern bool DllImportMethod();
     }
+#pragma warning restore CA1060
 
     [Serializable]
     private class SerializableTestClass

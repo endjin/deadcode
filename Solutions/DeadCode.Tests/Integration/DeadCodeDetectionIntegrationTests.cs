@@ -417,6 +417,6 @@ public class DeadCodeDetectionIntegrationTests : IDisposable
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        // Cleanup is handled in the Cleanup method
     }
 }
