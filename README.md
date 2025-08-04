@@ -257,3 +257,7 @@ Apache License 2.0 - see LICENSE file for details.
 4. **LLM Cleanup**: Feed report to Claude/GPT for automated cleanup tasks
 
 The tool provides file:line references perfect for LLM-driven code refactoring!
+
+---
+
+*Built entirely from prompts with Claude Code using Opus 4 & Sonnet 4 models*
