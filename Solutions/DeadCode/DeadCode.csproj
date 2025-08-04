@@ -19,7 +19,7 @@
     <RepositoryUrl>https://github.com/endjin/deadcode</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Copyright>Copyright © 2024 Endjin Limited</Copyright>
+    <Copyright>Copyright © $([System.DateTime]::Now.Year) Endjin Limited</Copyright>
     <Company>Endjin</Company>
     <PackageReleaseNotes>See https://github.com/endjin/deadcode/releases</PackageReleaseNotes>
   </PropertyGroup>
