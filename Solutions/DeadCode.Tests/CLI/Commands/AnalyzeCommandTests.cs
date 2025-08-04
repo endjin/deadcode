@@ -12,7 +12,7 @@ using Spectre.Console.Testing;
 namespace DeadCode.Tests.CLI.Commands;
 
 [TestClass]
-public class AnalyzeCommandTests
+public class AnalyzeCommandTests : IDisposable
 {
     private readonly IComparisonEngine mockComparisonEngine;
     private readonly ITraceParser mockTraceParser;
@@ -488,5 +488,10 @@ public class AnalyzeCommandTests
 
         report.AddUnusedMethod(unusedMethod);
         return report;
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -227,7 +227,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         IEnumerable<UnusedMethod> methods = minLevel switch
         {
             SafetyClassification.HighConfidence => report.HighConfidenceMethods,
-            SafetyClassification.MediumConfidence => [..report.HighConfidenceMethods, ..report.MediumConfidenceMethods],
+            SafetyClassification.MediumConfidence => [.. report.HighConfidenceMethods, .. report.MediumConfidenceMethods],
             SafetyClassification.LowConfidence => report.UnusedMethods.AsEnumerable().Where(m => m.Method.SafetyLevel != SafetyClassification.DoNotRemove),
             _ => report.HighConfidenceMethods
         };

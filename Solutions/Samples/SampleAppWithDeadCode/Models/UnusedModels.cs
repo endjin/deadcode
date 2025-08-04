@@ -13,9 +13,9 @@ public abstract class BaseEntity
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    
+
     protected abstract void Validate();
-    
+
     public virtual void Save()
     {
         Validate();
@@ -29,12 +29,12 @@ public class Customer
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public DateTime DateOfBirth { get; set; }
-    
+
     public int GetAge()
     {
         return DateTime.Today.Year - DateOfBirth.Year;
     }
-    
+
     private bool IsValidEmail()
     {
         return Email.Contains("@") && Email.Contains(".");
@@ -47,7 +47,7 @@ public static class Constants
     public const string DefaultConnectionString = "Server=localhost;Database=SampleDb";
     public const int MaxRetryCount = 3;
     public const double TaxRate = 0.08;
-    
+
     public static readonly string[] SupportedFileTypes = { ".txt", ".csv", ".json" };
 }
 
@@ -55,10 +55,10 @@ public static class Constants
 public class ConfigurationManager
 {
     private static ConfigurationManager? instance;
-    private static readonly object @lock = new object();
-    
+    private static readonly object @lock = new();
+
     private ConfigurationManager() { }
-    
+
     public static ConfigurationManager Instance
     {
         get
@@ -73,7 +73,7 @@ public class ConfigurationManager
             return instance;
         }
     }
-    
+
     public string GetSetting(string key)
     {
         // Placeholder implementation

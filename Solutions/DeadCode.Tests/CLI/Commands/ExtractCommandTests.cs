@@ -12,7 +12,7 @@ using Spectre.Console.Testing;
 namespace DeadCode.Tests.CLI.Commands;
 
 [TestClass]
-public class ExtractCommandTests
+public class ExtractCommandTests : IDisposable
 {
     private readonly IMethodInventoryExtractor mockExtractor;
     private readonly ILogger<ExtractCommand> mockLogger;
@@ -317,5 +317,10 @@ public class ExtractCommandTests
         MethodInventory inventory = new();
         inventory.AddMethods(methods);
         return inventory;
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

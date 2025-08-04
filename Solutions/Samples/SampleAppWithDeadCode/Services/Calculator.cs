@@ -7,19 +7,19 @@ public class Calculator
     {
         return a + b;
     }
-    
+
     // DEAD CODE: Never called
     public int Subtract(int a, int b)
     {
         return a - b;
     }
-    
+
     // DEAD CODE: Never called
     public int Multiply(int a, int b)
     {
         return a * b;
     }
-    
+
     // DEAD CODE: Never called
     public double Divide(double a, double b)
     {
@@ -29,13 +29,13 @@ public class Calculator
         }
         return a / b;
     }
-    
+
     // DEAD CODE: Private method never called
     private double CalculateSquareRoot(double value)
     {
         return Math.Sqrt(value);
     }
-    
+
     // DEAD CODE: Protected virtual method never overridden or called
     protected virtual double CalculateLogarithm(double value)
     {

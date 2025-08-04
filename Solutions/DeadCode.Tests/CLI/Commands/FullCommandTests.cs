@@ -8,7 +8,7 @@ using Spectre.Console.Testing;
 namespace DeadCode.Tests.CLI.Commands;
 
 [TestClass]
-public class FullCommandTests
+public class FullCommandTests : IDisposable
 {
     private readonly ExtractCommand mockExtractCommand;
     private readonly ProfileCommand mockProfileCommand;
@@ -520,5 +520,10 @@ public class FullCommandTests
             File.Delete(tempExe);
             tempDir.Delete(true);
         }
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

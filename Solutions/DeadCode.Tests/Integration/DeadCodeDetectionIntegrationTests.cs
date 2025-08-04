@@ -12,7 +12,7 @@ using Spectre.Console.Testing;
 namespace DeadCode.Tests.Integration;
 
 [TestClass]
-public class DeadCodeDetectionIntegrationTests
+public class DeadCodeDetectionIntegrationTests : IDisposable
 {
     private const string SampleAppPath = "Samples/SampleAppWithDeadCode/bin/Debug/net9.0/SampleAppWithDeadCode.dll";
     private readonly string testOutputDir;
@@ -413,5 +413,10 @@ public class DeadCodeDetectionIntegrationTests
             m.Method.MethodName.Contains(methodName));
 
         unused.ShouldBeFalse($"Expected {className}.{methodName} to be used, but it was found in unused methods");
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -12,7 +12,7 @@ using Spectre.Console.Testing;
 namespace DeadCode.Tests.CLI.Commands;
 
 [TestClass]
-public class ProfileCommandTests
+public class ProfileCommandTests : IDisposable
 {
     private readonly ITraceRunner mockTraceRunner;
     private readonly IDependencyVerifier mockDependencyVerifier;
@@ -346,7 +346,7 @@ public class ProfileCommandTests
 
             // Assert
             result.ShouldBe(1);
-            
+
             // Verify that LogError was called with the expected exception
             mockLogger.Received(1).Log(
                 LogLevel.Error,
@@ -460,5 +460,10 @@ public class ProfileCommandTests
             IsSuccessful: false,
             ErrorMessage: "Test error"
         );
+    }
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

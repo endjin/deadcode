@@ -13,12 +13,15 @@
     <Authors>DeadCode Contributors</Authors>
     <Description>A .NET global tool that identifies unused code through static and dynamic analysis</Description>
     <PackageTags>dead-code;static-analysis;dynamic-analysis;code-quality;cleanup;refactoring</PackageTags>
-    <PackageProjectUrl>https://github.com/example/deadcode</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/endjin/deadcode</PackageProjectUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/example/deadcode</RepositoryUrl>
+    <RepositoryUrl>https://github.com/endjin/deadcode</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright © 2024 Endjin Limited</Copyright>
+    <Company>Endjin</Company>
+    <PackageReleaseNotes>See https://github.com/endjin/deadcode/releases</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
