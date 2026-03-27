@@ -53,7 +53,7 @@ public class ExtractCommand : AsyncCommand<ExtractCommand.Settings>
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting method inventory extraction");
 
@@ -92,8 +92,10 @@ public class ExtractCommand : AsyncCommand<ExtractCommand.Settings>
 
                     task.StopTask();
 
+                    cancellation.ThrowIfCancellationRequested();
+
                     // Save inventory to JSON
-                    await SaveInventoryAsync(inventory, settings.OutputPath);
+                    await SaveInventoryAsync(inventory, settings.OutputPath, cancellation);
 
                     // Display summary
                     DisplaySummary(inventory);
@@ -112,16 +114,11 @@ public class ExtractCommand : AsyncCommand<ExtractCommand.Settings>
         return result;
     }
 
-    private async Task SaveInventoryAsync(MethodInventory inventory, string outputPath)
+    private async Task SaveInventoryAsync(MethodInventory inventory, string outputPath, CancellationToken cancellation = default)
     {
-        string json = System.Text.Json.JsonSerializer.Serialize(inventory, new System.Text.Json.JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        });
+        string json = System.Text.Json.JsonSerializer.Serialize(inventory, Infrastructure.IO.JsonOptions.ReadWrite);
 
-        await File.WriteAllTextAsync(outputPath, json);
+        await File.WriteAllTextAsync(outputPath, json, cancellation);
 
         console.MarkupLine($"[green]✓[/] Inventory saved to [blue]{outputPath}[/]");
     }

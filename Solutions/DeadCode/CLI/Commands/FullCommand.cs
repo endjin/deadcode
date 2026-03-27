@@ -80,7 +80,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting full deadcode analysis pipeline");
 
@@ -106,12 +106,14 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 IncludeGenerated = false
             };
 
-            int extractResult = await extractCommand.ExecuteAsync(context, extractSettings);
+            int extractResult = await extractCommand.ExecuteAsync(context, extractSettings, cancellation);
             if (extractResult != 0)
             {
                 console.MarkupLine("[red]Failed to extract method inventory[/]");
                 return extractResult;
             }
+
+            cancellation.ThrowIfCancellationRequested();
 
             // Step 2: Profile application
             console.MarkupLine("\n[bold]Step 2:[/] Profiling application execution");
@@ -124,11 +126,13 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 OutputDirectory = tracesDirectory
             };
 
-            int profileResult = await profileCommand.ExecuteAsync(context, profileSettings);
+            int profileResult = await profileCommand.ExecuteAsync(context, profileSettings, cancellation);
             if (profileResult != 0)
             {
                 console.MarkupLine("[yellow]Warning: Some profiling scenarios failed[/]");
             }
+
+            cancellation.ThrowIfCancellationRequested();
 
             // Step 3: Analyze results
             console.MarkupLine("\n[bold]Step 3:[/] Analyzing for unused code");
@@ -142,7 +146,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 MinConfidence = settings.MinConfidence
             };
 
-            int analyzeResult = await analyzeCommand.ExecuteAsync(context, analyzeSettings);
+            int analyzeResult = await analyzeCommand.ExecuteAsync(context, analyzeSettings, cancellation);
             if (analyzeResult != 0)
             {
                 console.MarkupLine("[red]Failed to analyze redundancy[/]");

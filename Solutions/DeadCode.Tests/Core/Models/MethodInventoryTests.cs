@@ -171,4 +171,23 @@ public class MethodInventoryTests
             SafetyLevel: safety
         );
     }
+
+    [TestMethod]
+    public void MethodsByAssembly_AfterAddMethod_ReflectsNewMethod()
+    {
+        // Arrange
+        MethodInventory inventory = new();
+        inventory.AddMethod(CreateTestMethod("Method1"));
+
+        // Act - access to populate cache
+        IReadOnlyDictionary<string, List<MethodInfo>> before = inventory.MethodsByAssembly;
+        before.Values.Sum(v => v.Count).ShouldBe(1);
+
+        // Add another method (should invalidate cache)
+        inventory.AddMethod(CreateTestMethod("Method2"));
+        IReadOnlyDictionary<string, List<MethodInfo>> after = inventory.MethodsByAssembly;
+
+        // Assert
+        after.Values.Sum(v => v.Count).ShouldBe(2);
+    }
 }

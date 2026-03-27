@@ -38,11 +38,8 @@ services.AddSingleton<ProfileCommand>();
 services.AddSingleton<AnalyzeCommand>();
 services.AddSingleton<FullCommand>();
 
-// Build service provider
-ServiceProvider serviceProvider = services.BuildServiceProvider();
-
-// Create type registrar for Spectre.Console.Cli
-TypeRegistrar registrar = new(serviceProvider);
+// Create type registrar for Spectre.Console.Cli (defers BuildServiceProvider until Build())
+TypeRegistrar registrar = new(services);
 
 // Create and configure the CLI app
 CommandApp app = new(registrar);
@@ -54,7 +51,7 @@ app.Configure(config =>
     // Add commands
     config.AddCommand<ExtractCommand>("extract")
         .WithDescription("Extract method inventory from assemblies")
-        .WithExample("extract", "bin/Release/net9.0/*.dll", "-o", "inventory.json");
+        .WithExample("extract", "bin/Release/net10.0/*.dll", "-o", "inventory.json");
 
     config.AddCommand<ProfileCommand>("profile")
         .WithDescription("Profile application execution")
@@ -66,7 +63,7 @@ app.Configure(config =>
 
     config.AddCommand<FullCommand>("full")
         .WithDescription("Run complete analysis pipeline")
-        .WithExample("full", "--assemblies", "bin/Release/net9.0/*.dll", "--executable", "MyApp.exe");
+        .WithExample("full", "--assemblies", "bin/Release/net10.0/*.dll", "--executable", "MyApp.exe");
 
     // Configure help
     config.ValidateExamples();
@@ -78,32 +75,32 @@ return await app.RunAsync(args);
 // Type registrar implementation for DI
 public sealed class TypeRegistrar : ITypeRegistrar
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly IServiceCollection services;
 
-    public TypeRegistrar(IServiceProvider serviceProvider)
+    public TypeRegistrar(IServiceCollection services)
     {
-        ArgumentNullException.ThrowIfNull(serviceProvider);
-        this.serviceProvider = serviceProvider;
+        ArgumentNullException.ThrowIfNull(services);
+        this.services = services;
     }
 
     public ITypeResolver Build()
     {
-        return new TypeResolver(serviceProvider);
+        return new TypeResolver(services.BuildServiceProvider());
     }
 
     public void Register(Type service, Type implementation)
     {
-        // Not needed for our use case
+        services.AddSingleton(service, implementation);
     }
 
     public void RegisterInstance(Type service, object implementation)
     {
-        // Not needed for our use case
+        services.AddSingleton(service, implementation);
     }
 
     public void RegisterLazy(Type service, Func<object> factory)
     {
-        // Not needed for our use case
+        services.AddSingleton(service, _ => factory());
     }
 }
 

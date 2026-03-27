@@ -7,19 +7,18 @@ namespace DeadCode.Tests.CLI.Infrastructure;
 [TestClass]
 public class TypeRegistrarTests
 {
-    private readonly IServiceProvider serviceProvider;
+    private readonly ServiceCollection services;
     private readonly TypeRegistrar registrar;
 
     public TypeRegistrarTests()
     {
-        ServiceCollection services = new();
+        services = new ServiceCollection();
         services.AddSingleton<ITestService, TestService>();
-        serviceProvider = services.BuildServiceProvider();
-        registrar = new TypeRegistrar(serviceProvider);
+        registrar = new TypeRegistrar(services);
     }
 
     [TestMethod]
-    public void Constructor_WithNullServiceProvider_ThrowsArgumentNullException()
+    public void Constructor_WithNullServices_ThrowsArgumentNullException()
     {
         // Act & Assert
         Should.Throw<ArgumentNullException>(() => new TypeRegistrar(null!));
@@ -37,27 +36,54 @@ public class TypeRegistrarTests
     }
 
     [TestMethod]
-    public void Register_DoesNotThrow()
-    {
-        // Act & Assert
-        Should.NotThrow(() => registrar.Register(typeof(ITestService), typeof(TestService)));
-    }
-
-    [TestMethod]
-    public void RegisterInstance_DoesNotThrow()
+    public void Register_MakesTypeResolvable()
     {
         // Arrange
-        TestService instance = new();
+        ServiceCollection freshServices = new();
+        TypeRegistrar freshRegistrar = new(freshServices);
 
-        // Act & Assert
-        Should.NotThrow(() => registrar.RegisterInstance(typeof(ITestService), instance));
+        // Act
+        freshRegistrar.Register(typeof(ITestService), typeof(TestService));
+        ITypeResolver resolver = freshRegistrar.Build();
+
+        // Assert
+        object? result = resolver.Resolve(typeof(ITestService));
+        result.ShouldNotBeNull();
+        result.ShouldBeOfType<TestService>();
     }
 
     [TestMethod]
-    public void RegisterLazy_DoesNotThrow()
+    public void RegisterInstance_MakesInstanceResolvable()
     {
-        // Act & Assert
-        Should.NotThrow(() => registrar.RegisterLazy(typeof(ITestService), () => new TestService()));
+        // Arrange
+        ServiceCollection freshServices = new();
+        TypeRegistrar freshRegistrar = new(freshServices);
+        TestService instance = new();
+
+        // Act
+        freshRegistrar.RegisterInstance(typeof(ITestService), instance);
+        ITypeResolver resolver = freshRegistrar.Build();
+
+        // Assert
+        object? result = resolver.Resolve(typeof(ITestService));
+        result.ShouldBe(instance);
+    }
+
+    [TestMethod]
+    public void RegisterLazy_MakesLazyInstanceResolvable()
+    {
+        // Arrange
+        ServiceCollection freshServices = new();
+        TypeRegistrar freshRegistrar = new(freshServices);
+        TestService instance = new();
+
+        // Act
+        freshRegistrar.RegisterLazy(typeof(ITestService), () => instance);
+        ITypeResolver resolver = freshRegistrar.Build();
+
+        // Assert
+        object? result = resolver.Resolve(typeof(ITestService));
+        result.ShouldBe(instance);
     }
 
     [TestMethod]

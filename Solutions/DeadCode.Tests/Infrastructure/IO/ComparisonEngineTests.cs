@@ -205,6 +205,30 @@ public class ComparisonEngineTests
         report.LowConfidenceMethods.Count().ShouldBe(1);
     }
 
+    [TestMethod]
+    public void IdentifyUnusedMethods_WithNullInventory_ThrowsArgumentNullException()
+    {
+        Should.Throw<ArgumentNullException>(() => engine.IdentifyUnusedMethods(null!, []));
+    }
+
+    [TestMethod]
+    public void IdentifyUnusedMethods_WithNullExecutedMethods_ThrowsArgumentNullException()
+    {
+        Should.Throw<ArgumentNullException>(() => engine.IdentifyUnusedMethods(new MethodInventory(), null!));
+    }
+
+    [TestMethod]
+    public async Task CompareAsync_WithNullInventory_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(() => engine.CompareAsync(null!, []));
+    }
+
+    [TestMethod]
+    public async Task CompareAsync_WithNullExecutedMethods_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(() => engine.CompareAsync(new MethodInventory(), null!));
+    }
+
     // Helper method
     private static MethodInfo CreateMethodInfo(string name, SafetyClassification safety)
     {

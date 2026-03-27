@@ -140,6 +140,71 @@ public class ProfileCommandTests : IDisposable
     }
 
     [TestMethod]
+    public void Settings_Validation_RejectsZeroDuration()
+    {
+        string tempExe = Path.GetTempFileName();
+        try
+        {
+            ProfileCommand.Settings settings = new() { ExecutablePath = tempExe, Duration = 0 };
+            Spectre.Console.ValidationResult result = settings.Validate();
+            result.Successful.ShouldBeFalse();
+            result.Message!.ShouldContain("Duration must be a positive number");
+        }
+        finally
+        {
+            File.Delete(tempExe);
+        }
+    }
+
+    [TestMethod]
+    public void Settings_Validation_RejectsNegativeDuration()
+    {
+        string tempExe = Path.GetTempFileName();
+        try
+        {
+            ProfileCommand.Settings settings = new() { ExecutablePath = tempExe, Duration = -5 };
+            Spectre.Console.ValidationResult result = settings.Validate();
+            result.Successful.ShouldBeFalse();
+        }
+        finally
+        {
+            File.Delete(tempExe);
+        }
+    }
+
+    [TestMethod]
+    public void Settings_Validation_AcceptsPositiveDuration()
+    {
+        string tempExe = Path.GetTempFileName();
+        try
+        {
+            ProfileCommand.Settings settings = new() { ExecutablePath = tempExe, Duration = 30 };
+            Spectre.Console.ValidationResult result = settings.Validate();
+            result.Successful.ShouldBeTrue();
+        }
+        finally
+        {
+            File.Delete(tempExe);
+        }
+    }
+
+    [TestMethod]
+    public void Settings_Validation_AcceptsNullDuration()
+    {
+        string tempExe = Path.GetTempFileName();
+        try
+        {
+            ProfileCommand.Settings settings = new() { ExecutablePath = tempExe, Duration = null };
+            Spectre.Console.ValidationResult result = settings.Validate();
+            result.Successful.ShouldBeTrue();
+        }
+        finally
+        {
+            File.Delete(tempExe);
+        }
+    }
+
+    [TestMethod]
     public async Task ExecuteAsync_WithMissingDependencies_Returns1()
     {
         // Arrange
@@ -156,7 +221,7 @@ public class ProfileCommandTests : IDisposable
             testConsole.Input.PushTextWithEnter("n");
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -192,7 +257,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -223,7 +288,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateFailedTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -270,7 +335,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -307,7 +372,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -342,7 +407,7 @@ public class ProfileCommandTests : IDisposable
                 .ThrowsAsync(new InvalidOperationException("Test error"));
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -384,7 +449,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             await mockTraceRunner.Received(1).RunProfilingAsync(
@@ -421,7 +486,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             string output = testConsole.Output;

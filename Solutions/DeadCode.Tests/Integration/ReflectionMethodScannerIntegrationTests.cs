@@ -39,7 +39,7 @@ public class ReflectionMethodScannerIntegrationTests
         // Arrange
         string assemblyPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "TestFixtures", "SampleConsoleApp", "bin", "Debug", "net9.0", "SampleConsoleApp.dll");
+            "..", "..", "..", "TestFixtures", "SampleConsoleApp", "bin", "Debug", "net10.0", "SampleConsoleApp.dll");
 
         // Ensure the sample app is built
         if (!File.Exists(assemblyPath))
@@ -85,7 +85,7 @@ public class ReflectionMethodScannerIntegrationTests
         // Arrange
         string assemblyPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net9.0", "SampleAsyncApp.dll");
+            "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net10.0", "SampleAsyncApp.dll");
 
         if (!File.Exists(assemblyPath))
         {
@@ -120,7 +120,7 @@ public class ReflectionMethodScannerIntegrationTests
         // Arrange
         string assemblyPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "TestFixtures", "SampleInheritanceApp", "bin", "Debug", "net9.0", "SampleInheritanceApp.dll");
+            "..", "..", "..", "TestFixtures", "SampleInheritanceApp", "bin", "Debug", "net10.0", "SampleInheritanceApp.dll");
 
         if (!File.Exists(assemblyPath))
         {
@@ -159,7 +159,7 @@ public class ReflectionMethodScannerIntegrationTests
         // Arrange
         string assemblyPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net9.0", "SampleAsyncApp.dll");
+            "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net10.0", "SampleAsyncApp.dll");
 
         if (!File.Exists(assemblyPath))
         {
@@ -188,8 +188,8 @@ public class ReflectionMethodScannerIntegrationTests
         // Arrange
         string[] assemblyPaths = new[]
         {
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "TestFixtures", "SampleConsoleApp", "bin", "Debug", "net9.0", "SampleConsoleApp.dll"),
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net9.0", "SampleAsyncApp.dll")
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "TestFixtures", "SampleConsoleApp", "bin", "Debug", "net10.0", "SampleConsoleApp.dll"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "TestFixtures", "SampleAsyncApp", "bin", "Debug", "net10.0", "SampleAsyncApp.dll")
         }.Where(File.Exists).ToArray();
 
         if (assemblyPaths.Length < 2)

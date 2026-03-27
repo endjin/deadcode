@@ -73,11 +73,16 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
                 return ValidationResult.Error($"Scenarios file not found: {ScenariosPath}");
             }
 
+            if (Duration is <= 0)
+            {
+                return ValidationResult.Error("Duration must be a positive number of seconds");
+            }
+
             return ValidationResult.Success();
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting profiling session");
 
@@ -88,7 +93,7 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
         }
 
         // Load scenarios or create default
-        List<ProfilingScenario> scenarios = await LoadScenariosAsync(settings);
+        List<ProfilingScenario> scenarios = await LoadScenariosAsync(settings, cancellation);
 
         List<TraceResult> results = [];
 
@@ -106,6 +111,8 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
 
                 foreach (ProfilingScenario scenario in scenarios)
                 {
+                    cancellation.ThrowIfCancellationRequested();
+
                     task.Description = $"[green]Profiling: {scenario.Name}[/]";
 
                     try
@@ -180,11 +187,11 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
         return true;
     }
 
-    private async Task<List<ProfilingScenario>> LoadScenariosAsync(Settings settings)
+    private async Task<List<ProfilingScenario>> LoadScenariosAsync(Settings settings, CancellationToken cancellationToken = default)
     {
         if (settings.ScenariosPath != null)
         {
-            string json = await File.ReadAllTextAsync(settings.ScenariosPath);
+            string json = await File.ReadAllTextAsync(settings.ScenariosPath, cancellationToken);
             System.Text.Json.JsonSerializerOptions options = new()
             {
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase

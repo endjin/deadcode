@@ -25,7 +25,7 @@ public class PdbReader : IPdbReader
     public Task<SourceLocation?> GetSourceLocationAsync(MethodBase method, string assemblyPath)
     {
         ArgumentNullException.ThrowIfNull(method);
-        if (string.IsNullOrEmpty(assemblyPath)) throw new ArgumentException("Assembly path cannot be null or empty", nameof(assemblyPath));
+        ArgumentException.ThrowIfNullOrEmpty(assemblyPath);
 
         string pdbPath = Path.ChangeExtension(assemblyPath, ".pdb");
         if (!File.Exists(pdbPath))

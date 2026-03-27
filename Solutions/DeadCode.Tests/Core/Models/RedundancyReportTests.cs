@@ -235,4 +235,21 @@ public class RedundancyReportTests
 
         return new UnusedMethod(method, []);
     }
+
+    [TestMethod]
+    public void HighConfidenceMethods_AfterAddUnusedMethod_ReflectsNewMethod()
+    {
+        // Arrange
+        RedundancyReport report = new() { AnalyzedAssemblies = [], TraceScenarios = [] };
+        report.AddUnusedMethod(CreateUnusedMethod(SafetyClassification.HighConfidence));
+
+        // Act - access to populate cache
+        report.HighConfidenceMethods.Count().ShouldBe(1);
+
+        // Add another method (should invalidate cache)
+        report.AddUnusedMethod(CreateUnusedMethod(SafetyClassification.HighConfidence));
+
+        // Assert
+        report.HighConfidenceMethods.Count().ShouldBe(2);
+    }
 }

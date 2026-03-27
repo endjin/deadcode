@@ -25,7 +25,7 @@ public class DotnetTraceVerifier : IDependencyVerifier
     {
         try
         {
-            Process process = new()
+            using Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -68,7 +68,7 @@ public class DotnetTraceVerifier : IDependencyVerifier
         {
             AnsiConsole.MarkupLine("[yellow]Installing dotnet-trace...[/]");
 
-            Process process = new()
+            using Process process = new()
             {
                 StartInfo = new ProcessStartInfo
                 {

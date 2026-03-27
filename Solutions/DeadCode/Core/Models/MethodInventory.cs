@@ -8,6 +8,7 @@ namespace DeadCode.Core.Models;
 public class MethodInventory
 {
     private readonly List<MethodInfo> methods = [];
+    private IReadOnlyDictionary<string, List<MethodInfo>>? cachedMethodsByAssembly;
 
     /// <summary>
     /// Gets or sets all methods in the inventory (for JSON serialization)
@@ -28,7 +29,7 @@ public class MethodInventory
     /// Gets methods grouped by assembly name
     /// </summary>
     public IReadOnlyDictionary<string, List<MethodInfo>> MethodsByAssembly =>
-        methods.GroupBy(m => m.AssemblyName).ToDictionary(g => g.Key, g => g.ToList());
+        cachedMethodsByAssembly ??= methods.GroupBy(m => m.AssemblyName).ToDictionary(g => g.Key, g => g.ToList());
 
     /// <summary>
     /// Adds a method to the inventory
@@ -37,6 +38,7 @@ public class MethodInventory
     {
         ArgumentNullException.ThrowIfNull(method);
         methods.Add(method);
+        cachedMethodsByAssembly = null;
     }
 
     /// <summary>
@@ -46,6 +48,7 @@ public class MethodInventory
     {
         ArgumentNullException.ThrowIfNull(methods);
         this.methods.AddRange(methods);
+        cachedMethodsByAssembly = null;
     }
 
     /// <summary>

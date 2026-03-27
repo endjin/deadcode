@@ -22,6 +22,9 @@ public class JsonReportGenerator : IReportGenerator
 
     public async Task GenerateAsync(RedundancyReport report, string outputPath)
     {
+        ArgumentNullException.ThrowIfNull(report);
+        ArgumentException.ThrowIfNullOrEmpty(outputPath);
+
         logger.LogInformation("Generating JSON report to {Path}", outputPath);
 
         JsonSerializerOptions options = new()
@@ -33,36 +36,9 @@ public class JsonReportGenerator : IReportGenerator
         // Create minimal LLM-ready output - only include methods with source locations
         var output = new
         {
-            highConfidence = report.HighConfidenceMethods
-                .Where(m => m.FilePath != null && m.LineNumber != null)
-                .Select(m => new
-                {
-                    file = m.FilePath,
-                    line = m.LineNumber,
-                    method = m.Method.MethodName,
-                    dependencies = m.Dependencies
-                })
-                .ToList(), // Force evaluation
-            mediumConfidence = report.MediumConfidenceMethods
-                .Where(m => m.FilePath != null && m.LineNumber != null)
-                .Select(m => new
-                {
-                    file = m.FilePath,
-                    line = m.LineNumber,
-                    method = m.Method.MethodName,
-                    dependencies = m.Dependencies
-                })
-                .ToList(), // Force evaluation
-            lowConfidence = report.LowConfidenceMethods
-                .Where(m => m.FilePath != null && m.LineNumber != null)
-                .Select(m => new
-                {
-                    file = m.FilePath,
-                    line = m.LineNumber,
-                    method = m.Method.MethodName,
-                    dependencies = m.Dependencies
-                })
-                .ToList() // Force evaluation
+            highConfidence = FormatMethods(report.HighConfidenceMethods),
+            mediumConfidence = FormatMethods(report.MediumConfidenceMethods),
+            lowConfidence = FormatMethods(report.LowConfidenceMethods)
         };
 
         string json = JsonSerializer.Serialize(output, options);
@@ -70,4 +46,16 @@ public class JsonReportGenerator : IReportGenerator
 
         logger.LogInformation("Report generated successfully");
     }
+
+    private static List<object> FormatMethods(IEnumerable<UnusedMethod> methods) =>
+        methods
+            .Where(m => m.FilePath != null && m.LineNumber != null)
+            .Select(m => (object)new
+            {
+                file = m.FilePath,
+                line = m.LineNumber,
+                method = m.Method.MethodName,
+                dependencies = m.Dependencies
+            })
+            .ToList();
 }

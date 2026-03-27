@@ -16,7 +16,7 @@ DeadCode combines static reflection-based method extraction with runtime trace p
 - **Framework Filtering**: Automatically filters out System.*, Microsoft.*, and Internal.* methods
 - **Smart Method Handling**: Special handling for async state machines, lambdas, and constructors
 - **Interactive Setup**: Automatic dotnet-trace installation if missing
-- **Modern .NET**: Built on .NET 9.0 with C# 12 language features
+- **Modern .NET**: Built on .NET 10.0 with C# 13 language features
 
 ## Installation
 
@@ -37,7 +37,7 @@ Run complete analysis pipeline:
 dotnet build -c Release
 
 # Run full analysis
-deadcode full --assemblies ./bin/Release/net9.0/*.dll --executable ./bin/Release/net9.0/MyApp.exe
+deadcode full --assemblies ./bin/Release/net10.0/*.dll --executable ./bin/Release/net10.0/MyApp.exe
 ```
 
 ### Individual Commands
@@ -45,7 +45,7 @@ deadcode full --assemblies ./bin/Release/net9.0/*.dll --executable ./bin/Release
 #### 1. Extract Method Inventory
 
 ```bash
-deadcode extract bin/Release/net9.0/*.dll -o inventory.json
+deadcode extract bin/Release/net10.0/*.dll -o inventory.json
 ```
 
 Example `inventory.json`:
@@ -255,7 +255,7 @@ Solutions/
 
 ## Requirements
 
-- .NET 9.0 SDK or later
+- .NET 10.0 SDK or later
 - Windows, Linux, or macOS
 - dotnet-trace (automatically installed if missing)
 
@@ -330,7 +330,7 @@ Apache License 2.0 - see LICENSE file for details.
 ## Example Workflow
 
 1. **Build Project**: `dotnet build -c Release`
-2. **Run Analysis**: `deadcode full --assemblies bin/Release/net9.0/*.dll --executable MyApp.exe`
+2. **Run Analysis**: `deadcode full --assemblies bin/Release/net10.0/*.dll --executable MyApp.exe`
 3. **Review Report**: Check `analysis/report.json` for unused methods
 4. **LLM Cleanup**: Feed report to Claude/GPT for automated cleanup tasks
 

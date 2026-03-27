@@ -181,15 +181,15 @@ public class FullCommandTests : IDisposable
                 MinConfidence = "high"
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -217,16 +217,16 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir.FullName
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(1); // Failed extraction
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
-            await mockProfileCommand.DidNotReceive().ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<ProfileCommand.Settings>());
-            await mockAnalyzeCommand.DidNotReceive().ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<AnalyzeCommand.Settings>());
+            await mockProfileCommand.DidNotReceive().ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>());
+            await mockAnalyzeCommand.DidNotReceive().ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -251,19 +251,19 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir.FullName
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(1); // Failed profiling
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
-            await mockAnalyzeCommand.Received(1).ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<AnalyzeCommand.Settings>());
+            await mockAnalyzeCommand.Received(1).ExecuteAsync(Arg.Any<CommandContext>(), Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -288,15 +288,15 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir.FullName
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(1); // Failed analysis
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -326,35 +326,38 @@ public class FullCommandTests : IDisposable
                 MinConfidence = "medium"
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             await mockExtractCommand.Received(1).ExecuteAsync(context,
                 Arg.Is<ExtractCommand.Settings>(s =>
                     s.Assemblies.SequenceEqual(settings.Assemblies) &&
                     s.OutputPath == Path.Combine(settings.OutputDirectory, "inventory.json") &&
-                    s.IncludeGenerated == false));
+                    s.IncludeGenerated == false),
+                Arg.Any<CancellationToken>());
 
             await mockProfileCommand.Received(1).ExecuteAsync(context,
                 Arg.Is<ProfileCommand.Settings>(s =>
                     s.ExecutablePath == settings.ExecutablePath &&
                     s.ScenariosPath == settings.ScenariosPath &&
-                    s.OutputDirectory == Path.Combine(settings.OutputDirectory, "traces")));
+                    s.OutputDirectory == Path.Combine(settings.OutputDirectory, "traces")),
+                Arg.Any<CancellationToken>());
 
             await mockAnalyzeCommand.Received(1).ExecuteAsync(context,
                 Arg.Is<AnalyzeCommand.Settings>(s =>
                     s.InventoryPath == Path.Combine(settings.OutputDirectory, "inventory.json") &&
                     s.TracePaths.SequenceEqual(new[] { Path.Combine(settings.OutputDirectory, "traces") }) &&
                     s.OutputPath == Path.Combine(settings.OutputDirectory, "report.json") &&
-                    s.MinConfidence == settings.MinConfidence));
+                    s.MinConfidence == settings.MinConfidence),
+                Arg.Any<CancellationToken>());
         }
         finally
         {
@@ -379,15 +382,15 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             Directory.Exists(tempDir).ShouldBeTrue();
@@ -417,11 +420,11 @@ public class FullCommandTests : IDisposable
             };
 
             InvalidOperationException expectedException = new("Test error");
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .ThrowsAsync(expectedException);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -453,15 +456,15 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir.FullName
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             mockLogger.Received().LogInformation("Starting full deadcode analysis pipeline");
@@ -490,15 +493,15 @@ public class FullCommandTests : IDisposable
                 OutputDirectory = tempDir.FullName
             };
 
-            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>())
+            mockExtractCommand.ExecuteAsync(context, Arg.Any<ExtractCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>())
+            mockProfileCommand.ExecuteAsync(context, Arg.Any<ProfileCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
-            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>())
+            mockAnalyzeCommand.ExecuteAsync(context, Arg.Any<AnalyzeCommand.Settings>(), Arg.Any<CancellationToken>())
                 .Returns(0);
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             string output = testConsole.Output;

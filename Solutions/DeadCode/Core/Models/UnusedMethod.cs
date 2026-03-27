@@ -5,7 +5,7 @@ namespace DeadCode.Core.Models;
 /// </summary>
 public record UnusedMethod(
     MethodInfo Method,
-    List<string> Dependencies
+    IReadOnlyList<string> Dependencies
 )
 {
     /// <summary>
