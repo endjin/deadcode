@@ -265,8 +265,9 @@ public class TraceParser : ITraceParser
 
             return false;
         }
-        catch
+        catch (IOException ex)
         {
+            logger.LogDebug(ex, "Could not read trace file header: {Path}", filePath);
             return false;
         }
     }

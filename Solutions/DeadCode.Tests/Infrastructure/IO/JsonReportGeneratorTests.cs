@@ -210,4 +210,24 @@ public class JsonReportGeneratorTests
 
         return new UnusedMethod(method, ["dep1", "dep2"]);
     }
+
+    [TestMethod]
+    public async Task GenerateAsync_WithNullReport_ThrowsArgumentNullException()
+    {
+        await Should.ThrowAsync<ArgumentNullException>(() => generator.GenerateAsync(null!, "output.json"));
+    }
+
+    [TestMethod]
+    public async Task GenerateAsync_WithNullOutputPath_ThrowsArgumentException()
+    {
+        RedundancyReport report = new() { AnalyzedAssemblies = [], TraceScenarios = [] };
+        await Should.ThrowAsync<ArgumentException>(() => generator.GenerateAsync(report, null!));
+    }
+
+    [TestMethod]
+    public async Task GenerateAsync_WithEmptyOutputPath_ThrowsArgumentException()
+    {
+        RedundancyReport report = new() { AnalyzedAssemblies = [], TraceScenarios = [] };
+        await Should.ThrowAsync<ArgumentException>(() => generator.GenerateAsync(report, ""));
+    }
 }

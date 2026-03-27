@@ -361,6 +361,8 @@ public class DeadCodeDetectionIntegrationTests : IDisposable
         return report;
     }
 
+    private static readonly SemaphoreSlim buildLock = new(1, 1);
+
     private async Task EnsureSampleAppBuilt()
     {
         // Navigate from test assembly location to project root
@@ -376,24 +378,45 @@ public class DeadCodeDetectionIntegrationTests : IDisposable
         // Check if the dll exists
         string dllPath = Path.Combine(projectRoot, SampleAppPath);
 
-        if (!File.Exists(dllPath))
+        if (File.Exists(dllPath))
         {
+            return;
+        }
+
+        // Serialize concurrent build attempts (tests run in parallel)
+        await buildLock.WaitAsync();
+        try
+        {
+            // Double-check after acquiring lock
+            if (File.Exists(dllPath))
+            {
+                return;
+            }
+
             // Build the project
             System.Diagnostics.ProcessStartInfo startInfo = new()
             {
                 FileName = "dotnet",
                 Arguments = $"build \"{projectPath}\" -c Debug",
                 UseShellExecute = false,
-                CreateNoWindow = true
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
 
             using System.Diagnostics.Process? process = System.Diagnostics.Process.Start(startInfo);
-            await process!.WaitForExitAsync();
+            string stdout = await process!.StandardOutput.ReadToEndAsync();
+            string stderr = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
 
             if (process.ExitCode != 0)
             {
-                throw new InvalidOperationException("Failed to build sample app");
+                Assert.Inconclusive($"Failed to build sample app:\n{stderr}\n{stdout}");
             }
+        }
+        finally
+        {
+            buildLock.Release();
         }
     }
 

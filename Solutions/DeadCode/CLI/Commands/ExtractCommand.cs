@@ -114,12 +114,7 @@ public class ExtractCommand : AsyncCommand<ExtractCommand.Settings>
 
     private async Task SaveInventoryAsync(MethodInventory inventory, string outputPath)
     {
-        string json = System.Text.Json.JsonSerializer.Serialize(inventory, new System.Text.Json.JsonSerializerOptions
-        {
-            WriteIndented = true,
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        });
+        string json = System.Text.Json.JsonSerializer.Serialize(inventory, Infrastructure.IO.JsonOptions.ReadWrite);
 
         await File.WriteAllTextAsync(outputPath, json);
 

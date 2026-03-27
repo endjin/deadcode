@@ -6,6 +6,7 @@ namespace DeadCode.Core.Models;
 public class RedundancyReport
 {
     private readonly List<UnusedMethod> unusedMethods = [];
+    private IReadOnlyDictionary<SafetyClassification, List<UnusedMethod>>? cachedMethodsBySafety;
 
     /// <summary>
     /// Gets the timestamp when the report was generated
@@ -30,27 +31,25 @@ public class RedundancyReport
     /// <summary>
     /// Gets unused methods grouped by safety classification
     /// </summary>
-    public IReadOnlyDictionary<SafetyClassification, List<UnusedMethod>> MethodsBySafety =>
-        unusedMethods.GroupBy(um => um.Method.SafetyLevel)
-                      .ToDictionary(g => g.Key, g => g.ToList());
+    public IReadOnlyDictionary<SafetyClassification, List<UnusedMethod>> MethodsBySafety => GetOrBuildSafetyCache();
 
     /// <summary>
     /// Gets high confidence unused methods (safe to remove)
     /// </summary>
     public IEnumerable<UnusedMethod> HighConfidenceMethods =>
-        unusedMethods.Where(um => um.Method.SafetyLevel == SafetyClassification.HighConfidence);
+        GetOrBuildSafetyCache().TryGetValue(SafetyClassification.HighConfidence, out var list) ? list : [];
 
     /// <summary>
     /// Gets medium confidence unused methods (requires review)
     /// </summary>
     public IEnumerable<UnusedMethod> MediumConfidenceMethods =>
-        unusedMethods.Where(um => um.Method.SafetyLevel == SafetyClassification.MediumConfidence);
+        GetOrBuildSafetyCache().TryGetValue(SafetyClassification.MediumConfidence, out var list) ? list : [];
 
     /// <summary>
     /// Gets low confidence unused methods (likely false positives)
     /// </summary>
     public IEnumerable<UnusedMethod> LowConfidenceMethods =>
-        unusedMethods.Where(um => um.Method.SafetyLevel == SafetyClassification.LowConfidence);
+        GetOrBuildSafetyCache().TryGetValue(SafetyClassification.LowConfidence, out var list) ? list : [];
 
     /// <summary>
     /// Adds an unused method to the report
@@ -59,6 +58,7 @@ public class RedundancyReport
     {
         ArgumentNullException.ThrowIfNull(method);
         unusedMethods.Add(method);
+        cachedMethodsBySafety = null;
     }
 
     /// <summary>
@@ -68,7 +68,12 @@ public class RedundancyReport
     {
         ArgumentNullException.ThrowIfNull(methods);
         unusedMethods.AddRange(methods);
+        cachedMethodsBySafety = null;
     }
+
+    private IReadOnlyDictionary<SafetyClassification, List<UnusedMethod>> GetOrBuildSafetyCache() =>
+        cachedMethodsBySafety ??= unusedMethods.GroupBy(um => um.Method.SafetyLevel)
+                                                .ToDictionary(g => g.Key, g => g.ToList());
 
     /// <summary>
     /// Gets summary statistics for the report

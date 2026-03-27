@@ -20,6 +20,9 @@ public class ComparisonEngine : IComparisonEngine
 
     public Task<RedundancyReport> CompareAsync(MethodInventory inventory, HashSet<string> executedMethods)
     {
+        ArgumentNullException.ThrowIfNull(inventory);
+        ArgumentNullException.ThrowIfNull(executedMethods);
+
         logger.LogInformation(
             "Comparing {InventoryCount} methods against {ExecutedCount} executed methods",
             inventory.Count, executedMethods.Count);
@@ -31,16 +34,18 @@ public class ComparisonEngine : IComparisonEngine
 
     public RedundancyReport IdentifyUnusedMethods(MethodInventory inventory, HashSet<string> executedMethods)
     {
+        ArgumentNullException.ThrowIfNull(inventory);
+        ArgumentNullException.ThrowIfNull(executedMethods);
+
         RedundancyReport report = new()
         {
             AnalyzedAssemblies = inventory.MethodsByAssembly.Keys.ToList(),
             TraceScenarios = ["default"]
         };
 
-        // Create a case-insensitive set for comparison
+        // Create a lowercase set for comparison
         HashSet<string> executedMethodsLower = new(
-            executedMethods.Select(m => m.ToLowerInvariant()),
-            StringComparer.OrdinalIgnoreCase
+            executedMethods.Select(m => m.ToLowerInvariant())
         );
 
 

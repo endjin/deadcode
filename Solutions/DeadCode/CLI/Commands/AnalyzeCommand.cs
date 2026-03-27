@@ -174,13 +174,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
     private async Task<MethodInventory> LoadInventoryAsync(string path)
     {
         string json = await File.ReadAllTextAsync(path);
-        JsonSerializerOptions options = new()
-        {
-            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-            Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
-        };
 
-        return JsonSerializer.Deserialize<MethodInventory>(json, options)
+        return JsonSerializer.Deserialize<MethodInventory>(json, Infrastructure.IO.JsonOptions.ReadWrite)
             ?? throw new InvalidOperationException("Failed to deserialize inventory");
     }
 

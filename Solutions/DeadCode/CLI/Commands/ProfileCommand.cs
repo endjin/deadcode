@@ -73,6 +73,11 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
                 return ValidationResult.Error($"Scenarios file not found: {ScenariosPath}");
             }
 
+            if (Duration is <= 0)
+            {
+                return ValidationResult.Error("Duration must be a positive number of seconds");
+            }
+
             return ValidationResult.Success();
         }
     }
