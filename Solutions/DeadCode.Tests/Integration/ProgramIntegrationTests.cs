@@ -72,14 +72,13 @@ public class ProgramIntegrationTests
     }
 
     [TestMethod]
-    public void TypeRegistrar_CanBeCreatedWithServiceProvider()
+    public void TypeRegistrar_CanBeCreatedWithServiceCollection()
     {
         // Arrange
         ServiceCollection services = new();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
 
         // Act
-        TypeRegistrar registrar = new(serviceProvider);
+        TypeRegistrar registrar = new(services);
         ITypeResolver resolver = registrar.Build();
 
         // Assert

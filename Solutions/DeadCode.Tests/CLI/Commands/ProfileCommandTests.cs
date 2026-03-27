@@ -156,7 +156,7 @@ public class ProfileCommandTests : IDisposable
             testConsole.Input.PushTextWithEnter("n");
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -192,7 +192,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -223,7 +223,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateFailedTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -270,7 +270,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -307,7 +307,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -342,7 +342,7 @@ public class ProfileCommandTests : IDisposable
                 .ThrowsAsync(new InvalidOperationException("Test error"));
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -384,7 +384,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             await mockTraceRunner.Received(1).RunProfilingAsync(
@@ -421,7 +421,7 @@ public class ProfileCommandTests : IDisposable
                 .Returns(CreateSuccessfulTraceResult());
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             string output = testConsole.Output;

@@ -77,7 +77,7 @@ public class ProfileCommand : AsyncCommand<ProfileCommand.Settings>
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting profiling session");
 

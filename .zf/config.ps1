@@ -31,7 +31,7 @@ $SkipPackage = $false
 #
 # Build process configuration
 #
-$SolutionToBuild = (Resolve-Path (Join-Path $here ".\Solutions\DeadCode.sln")).Path
+$SolutionToBuild = (Resolve-Path (Join-Path $here ".\Solutions\DeadCode.slnx")).Path
 $ProjectsToPublish = @()
 $NuSpecFilesToPackage = @()
 $NugetPublishSource = property ZF_NUGET_PUBLISH_SOURCE "$here/_local-nuget-feed"

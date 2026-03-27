@@ -14,7 +14,7 @@ namespace DeadCode.Tests.Integration;
 [TestClass]
 public class DeadCodeDetectionIntegrationTests : IDisposable
 {
-    private const string SampleAppPath = "Samples/SampleAppWithDeadCode/bin/Debug/net9.0/SampleAppWithDeadCode.dll";
+    private const string SampleAppPath = "Samples/SampleAppWithDeadCode/bin/Debug/net10.0/SampleAppWithDeadCode.dll";
     private readonly string testOutputDir;
     private readonly IServiceProvider serviceProvider;
     private readonly TestConsole console;

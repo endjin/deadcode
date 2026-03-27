@@ -81,7 +81,7 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting redundancy analysis");
 

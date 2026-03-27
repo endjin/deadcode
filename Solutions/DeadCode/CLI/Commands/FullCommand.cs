@@ -80,7 +80,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
         }
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellation)
     {
         logger.LogInformation("Starting full deadcode analysis pipeline");
 
@@ -106,7 +106,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 IncludeGenerated = false
             };
 
-            int extractResult = await extractCommand.ExecuteAsync(context, extractSettings);
+            int extractResult = await extractCommand.ExecuteAsync(context, extractSettings, cancellation);
             if (extractResult != 0)
             {
                 console.MarkupLine("[red]Failed to extract method inventory[/]");
@@ -124,7 +124,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 OutputDirectory = tracesDirectory
             };
 
-            int profileResult = await profileCommand.ExecuteAsync(context, profileSettings);
+            int profileResult = await profileCommand.ExecuteAsync(context, profileSettings, cancellation);
             if (profileResult != 0)
             {
                 console.MarkupLine("[yellow]Warning: Some profiling scenarios failed[/]");
@@ -142,7 +142,7 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 MinConfidence = settings.MinConfidence
             };
 
-            int analyzeResult = await analyzeCommand.ExecuteAsync(context, analyzeSettings);
+            int analyzeResult = await analyzeCommand.ExecuteAsync(context, analyzeSettings, cancellation);
             if (analyzeResult != 0)
             {
                 console.MarkupLine("[red]Failed to analyze redundancy[/]");

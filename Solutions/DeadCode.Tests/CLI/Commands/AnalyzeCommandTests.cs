@@ -187,7 +187,7 @@ public class AnalyzeCommandTests : IDisposable
                 .Returns(report);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -230,7 +230,7 @@ public class AnalyzeCommandTests : IDisposable
                 .Returns(report);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -258,7 +258,7 @@ public class AnalyzeCommandTests : IDisposable
             };
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -291,7 +291,7 @@ public class AnalyzeCommandTests : IDisposable
                 .ThrowsAsync(expectedException);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(1);
@@ -328,7 +328,7 @@ public class AnalyzeCommandTests : IDisposable
                 .Returns(report);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -373,7 +373,7 @@ public class AnalyzeCommandTests : IDisposable
                 .Returns(report);
 
             // Act
-            int result = await command.ExecuteAsync(context, settings);
+            int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             result.ShouldBe(0);
@@ -445,7 +445,7 @@ public class AnalyzeCommandTests : IDisposable
                 .Returns(report);
 
             // Act
-            await command.ExecuteAsync(context, settings);
+            await command.ExecuteAsync(context, settings, CancellationToken.None);
 
             // Assert
             string output = testConsole.Output;

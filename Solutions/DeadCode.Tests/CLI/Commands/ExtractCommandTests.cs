@@ -129,7 +129,7 @@ public class ExtractCommandTests : IDisposable
             .Returns(testInventory);
 
         // Act
-        int result = await command.ExecuteAsync(context, settings);
+        int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         result.ShouldBe(0);
@@ -153,7 +153,7 @@ public class ExtractCommandTests : IDisposable
             .ThrowsAsync(expectedException);
 
         // Act
-        int result = await command.ExecuteAsync(context, settings);
+        int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         result.ShouldBe(1); // The command returns 1 on exception
@@ -179,7 +179,7 @@ public class ExtractCommandTests : IDisposable
             .Returns(testInventory);
 
         // Act
-        await command.ExecuteAsync(context, settings);
+        await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         await mockExtractor.Received(1).ExtractAsync(
@@ -204,7 +204,7 @@ public class ExtractCommandTests : IDisposable
             .Returns(testInventory);
 
         // Act
-        int result = await command.ExecuteAsync(context, settings);
+        int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         result.ShouldBe(0);
@@ -238,7 +238,7 @@ public class ExtractCommandTests : IDisposable
             });
 
         // Act
-        int result = await command.ExecuteAsync(context, settings);
+        int result = await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         result.ShouldBe(0);
@@ -259,7 +259,7 @@ public class ExtractCommandTests : IDisposable
             .Returns(testInventory);
 
         // Act
-        await command.ExecuteAsync(context, settings);
+        await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         mockLogger.Received().LogInformation("Starting method inventory extraction");
@@ -281,7 +281,7 @@ public class ExtractCommandTests : IDisposable
             .Returns(testInventory);
 
         // Act
-        await command.ExecuteAsync(context, settings);
+        await command.ExecuteAsync(context, settings, CancellationToken.None);
 
         // Assert
         string output = testConsole.Output;

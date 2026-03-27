@@ -15,7 +15,7 @@ dotnet tool install --global DeadCode
 dotnet build -c Release
 
 # Run full analysis
-deadcode full --assemblies ./bin/Release/net9.0/*.dll --executable ./bin/Release/net9.0/MyApp.exe
+deadcode full --assemblies ./bin/Release/net10.0/*.dll --executable ./bin/Release/net10.0/MyApp.exe
 
 # View the generated report
 cat analysis/report.json
@@ -33,7 +33,7 @@ cat analysis/report.json
 
 ### Extract method inventory
 ```bash
-deadcode extract bin/Release/net9.0/*.dll -o inventory.json
+deadcode extract bin/Release/net10.0/*.dll -o inventory.json
 ```
 
 Example `inventory.json`:
@@ -114,5 +114,5 @@ Apache License 2.0 - Copyright © 2024 Endjin Limited
 
 ## Requirements
 
-- .NET 9.0 SDK or later
+- .NET 10.0 SDK or later
 - Windows, Linux, or macOS

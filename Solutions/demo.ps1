@@ -30,8 +30,8 @@ Write-Host "✓ Build complete" -ForegroundColor Green
 # Step 2: Extract method inventory
 Write-Host "`nStep 2: Extracting method inventory through static analysis" -ForegroundColor Green
 Write-Host "This identifies all methods in the compiled assemblies..."
-dotnet DeadCode/bin/Release/net9.0/DeadCode.dll extract `
-    "$SAMPLE_APP/bin/Release/net9.0/*.dll" `
+dotnet DeadCode/bin/Release/net10.0/DeadCode.dll extract `
+    "$SAMPLE_APP/bin/Release/net10.0/*.dll" `
     -o "$DEMO_DIR/inventory.json"
 Write-Host "✓ Method inventory extracted" -ForegroundColor Green
 $methodCount = (Get-Content "$DEMO_DIR/inventory.json" | ConvertFrom-Json).methods.Count
@@ -40,8 +40,8 @@ Write-Host "Found methods: $methodCount"
 # Step 3: Profile application execution
 Write-Host "`nStep 3: Profiling application execution with scenarios" -ForegroundColor Green
 Write-Host "This captures which methods are actually called at runtime..."
-dotnet DeadCode/bin/Release/net9.0/DeadCode.dll profile `
-    "$SAMPLE_APP/bin/Release/net9.0/SampleAppWithDeadCode" `
+dotnet DeadCode/bin/Release/net10.0/DeadCode.dll profile `
+    "$SAMPLE_APP/bin/Release/net10.0/SampleAppWithDeadCode" `
     --scenarios "$SAMPLE_APP/scenarios.json" `
     -o "$DEMO_DIR/traces"
 Write-Host "✓ Profiling complete" -ForegroundColor Green
@@ -49,7 +49,7 @@ Write-Host "✓ Profiling complete" -ForegroundColor Green
 # Step 4: Analyze to find unused code
 Write-Host "`nStep 4: Analyzing to identify unused code" -ForegroundColor Green
 Write-Host "Comparing static inventory against runtime execution..."
-dotnet DeadCode/bin/Release/net9.0/DeadCode.dll analyze `
+dotnet DeadCode/bin/Release/net10.0/DeadCode.dll analyze `
     -i "$DEMO_DIR/inventory.json" `
     -t "$DEMO_DIR/traces" `
     -o "$DEMO_DIR/report.json" `
@@ -93,7 +93,7 @@ Write-Host "  Low confidence dead code: $lowConf"
 # Alternative: Run full pipeline in one command
 Write-Host "`nAlternative: Run complete pipeline with one command" -ForegroundColor Green
 Write-Host "You can also run the entire analysis with:"
-Write-Host "dotnet DeadCode/bin/Release/net9.0/DeadCode.dll full --assemblies $SAMPLE_APP/bin/Release/net9.0/*.dll --executable $SAMPLE_APP/bin/Release/net9.0/SampleAppWithDeadCode" -ForegroundColor Blue
+Write-Host "dotnet DeadCode/bin/Release/net10.0/DeadCode.dll full --assemblies $SAMPLE_APP/bin/Release/net10.0/*.dll --executable $SAMPLE_APP/bin/Release/net10.0/SampleAppWithDeadCode" -ForegroundColor Blue
 
 Write-Host "`nDemo complete!" -ForegroundColor Green
 Write-Host "Check the $DEMO_DIR directory for all generated files:"
