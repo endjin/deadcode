@@ -95,7 +95,9 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
                     ctx.SpinnerStyle(Style.Parse("green"));
                 });
 
-            MethodInventory inventory = await LoadInventoryAsync(settings.InventoryPath);
+            cancellation.ThrowIfCancellationRequested();
+
+            MethodInventory inventory = await LoadInventoryAsync(settings.InventoryPath, cancellation);
             console.MarkupLine($"[green]✓[/] Loaded [blue]{inventory.Count}[/] methods from inventory");
 
             // Find and parse trace files
@@ -124,6 +126,8 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
 
                     foreach (string traceFile in traceFiles)
                     {
+                        cancellation.ThrowIfCancellationRequested();
+
                         task.Description = $"[green]Parsing {Path.GetFileName(traceFile)}[/]";
 
                         HashSet<string> methods = await traceParser.ParseTraceAsync(traceFile);
@@ -171,9 +175,9 @@ public class AnalyzeCommand : AsyncCommand<AnalyzeCommand.Settings>
         }
     }
 
-    private async Task<MethodInventory> LoadInventoryAsync(string path)
+    private async Task<MethodInventory> LoadInventoryAsync(string path, CancellationToken cancellationToken = default)
     {
-        string json = await File.ReadAllTextAsync(path);
+        string json = await File.ReadAllTextAsync(path, cancellationToken);
 
         return JsonSerializer.Deserialize<MethodInventory>(json, Infrastructure.IO.JsonOptions.ReadWrite)
             ?? throw new InvalidOperationException("Failed to deserialize inventory");

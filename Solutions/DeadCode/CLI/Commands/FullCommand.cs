@@ -113,6 +113,8 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
                 return extractResult;
             }
 
+            cancellation.ThrowIfCancellationRequested();
+
             // Step 2: Profile application
             console.MarkupLine("\n[bold]Step 2:[/] Profiling application execution");
 
@@ -129,6 +131,8 @@ public class FullCommand : AsyncCommand<FullCommand.Settings>
             {
                 console.MarkupLine("[yellow]Warning: Some profiling scenarios failed[/]");
             }
+
+            cancellation.ThrowIfCancellationRequested();
 
             // Step 3: Analyze results
             console.MarkupLine("\n[bold]Step 3:[/] Analyzing for unused code");
